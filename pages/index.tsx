@@ -4,9 +4,11 @@ import Dmg from '../emulator';
 
 const Home = () => {
   const [dmg, setDmg] = useState<Dmg>();
+  const [log, setLog] = useState<string[]>([]);
   const startDmg = () => {
     const dmg = new Dmg();
 
+    dmg.addEventListener('log', () => setLog(dmg.log));
     dmg.start();
 
     setDmg(dmg);
@@ -16,6 +18,7 @@ const Home = () => {
     <main>
       <button onClick={startDmg}>Hello world!</button>
       {dmg && <OpcodeTable dmg={dmg} />}
+      <pre>{log.join('\n')}</pre>
     </main>
   );
 };

@@ -1,3 +1,4 @@
+import runInstruction from './runInstruction';
 import { Instruction, InstructionSet } from './types';
 
 type Register = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'h' | 'l';
@@ -45,7 +46,9 @@ const ld8 = (
   },
 });
 
-const DmgPrefixedInstructionSet: InstructionSet = {};
+const DmgPrefixedInstructionSet: InstructionSet = {
+  __PREFIX: 'cb',
+};
 
 const DmgMainInstructionSet: InstructionSet = {
   0x00: { doc: 'NOP', run: () => 0 },
@@ -131,9 +134,7 @@ const DmgMainInstructionSet: InstructionSet = {
     doc: `PREFIX CB`,
     run(dmg) {
       const opcode = dmg.readPc();
-      const instr = DmgPrefixedInstructionSet[opcode];
-      instr?.run(dmg);
-      console.log(instr?.doc);
+      runInstruction(dmg, opcode, DmgPrefixedInstructionSet);
     },
   },
 };

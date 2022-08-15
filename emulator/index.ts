@@ -1,33 +1,37 @@
+import bios from './bios';
 import DmgMainInstructionSet from './instructionSet';
 import RegisterSet from './registerSet';
+import runInstruction from './runInstruction';
 import { IDmg } from './types';
 
-class Dmg implements IDmg {
+class Dmg extends EventTarget implements IDmg {
   registers = new RegisterSet();
-
   instructionSet = DmgMainInstructionSet;
 
-  memory = [0x00, 0xcb, 0x00];
+  memory = bios;
   pc = 0;
   sp = 0;
   readPc(): number {
-    const ret = this.memory[this.pc];
+    const ret = this.memory.at(this.pc);
     this.pc += 1;
     return ret;
   }
 
   step() {
     const opcode = this.readPc();
-    const instr = this.instructionSet[opcode];
-    console.log(instr?.doc);
-    instr?.run(this);
+    runInstruction(this, opcode, this.instructionSet);
   }
 
   start() {
-    while (this.pc <= this.memory.length) {
+    while (this.pc < this.memory.length) {
       this.step();
     }
-    console.log('EOF');
+  }
+
+  log: string[] = [];
+  logEvent(log: string) {
+    this.log.push(log);
+    this.dispatchEvent(new Event('log'));
   }
 }
 
