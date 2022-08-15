@@ -131,7 +131,9 @@ const DmgMainInstructionSet: InstructionSet = {
     doc: `PREFIX CB`,
     run(dmg) {
       const opcode = dmg.readPc();
-      DmgPrefixedInstructionSet[opcode]?.run(dmg);
+      const instr = DmgPrefixedInstructionSet[opcode];
+      instr?.run(dmg);
+      console.log(instr?.doc);
     },
   },
 };
