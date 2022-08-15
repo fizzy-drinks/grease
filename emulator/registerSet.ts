@@ -1,5 +1,12 @@
 const MAX_BYTE = 0b11111111;
 
+enum Flags {
+  ZERO = 0b1000_0000,
+  SUB = 0b0100_0000,
+  HALF_CARRY = 0b0010_0000,
+  FULL_CARRY = 0b0001_0000,
+}
+
 const combineRegisters = (hi: number, lo: number): number => {
   return ((hi & MAX_BYTE) << 8) + (lo & MAX_BYTE);
 };
@@ -7,6 +14,9 @@ const combineRegisters = (hi: number, lo: number): number => {
 const splitRegisters = (i16: number): [number, number] => {
   return [i16 >> 8, i16 & MAX_BYTE];
 };
+
+const setFlag = (flag: number, value: boolean, flagByte: number): number =>
+  value ? flagByte | flag : flagByte & ~flag;
 
 class RegisterSet {
   a: number;
@@ -59,19 +69,35 @@ class RegisterSet {
   }
 
   get zero() {
-    return this.f & 0b1000_0000 ? true : false;
+    return this.f & Flags.ZERO ? true : false;
   }
 
-  get subtraction() {
-    return this.f & 0b0100_0000 ? true : false;
+  set zero(value) {
+    this.f = setFlag(Flags.ZERO, value, this.f);
   }
 
-  get halfCarry() {
-    return this.f & 0b0010_0000 ? true : false;
+  get sub() {
+    return this.f & Flags.SUB ? true : false;
+  }
+
+  set sub(value) {
+    this.f = setFlag(Flags.SUB, value, this.f);
+  }
+
+  get half() {
+    return this.f & Flags.HALF_CARRY ? true : false;
+  }
+
+  set half(value) {
+    this.f = setFlag(Flags.HALF_CARRY, value, this.f);
   }
 
   get carry() {
-    return this.f & 0b0001_0000 ? true : false;
+    return this.f & Flags.FULL_CARRY ? true : false;
+  }
+
+  set carry(value) {
+    this.f = setFlag(Flags.FULL_CARRY, value, this.f);
   }
 }
 

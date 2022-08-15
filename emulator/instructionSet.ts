@@ -2,20 +2,25 @@ import { Instruction, InstructionSet } from './types';
 
 type Register = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'h' | 'l';
 
-// TODO: set flags
+const i8 = (n: number) => n & 0xff;
+const i4 = (n: number) => n & 0xf;
+
 const add8 = (source: Register | 'd8' | 'hli'): Instruction => ({
   doc: `ADD a,${source}`,
   run(dmg) {
-    switch (source) {
-      case 'hli':
-        dmg.registers.a += dmg.memory[dmg.registers.hl];
-        break;
-      case 'd8':
-        dmg.registers.a += dmg.readPc();
-        break;
-      default:
-        dmg.registers.a += dmg.registers[source];
-    }
+    const addNum = i8(
+      source === 'hli'
+        ? dmg.memory[dmg.registers.hl]
+        : source === 'd8'
+        ? dmg.readPc()
+        : dmg.registers[source]
+    );
+
+    const result = i8(dmg.registers.a) + i8(addNum);
+    dmg.registers.carry = (dmg.registers.a & 0x100) > 0;
+    dmg.registers.half = ((i4(dmg.registers.a) + i4(addNum)) & 0x10) > 0;
+    dmg.registers.zero = i8(dmg.registers.a) === 0;
+    dmg.registers.a = i8(result);
   },
 });
 
