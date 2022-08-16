@@ -11,15 +11,16 @@ class Dmg extends EventTarget implements IDmg {
   memory = bios;
   pc = 0;
   sp = 0;
-  readPc(): number {
-    const ret = this.memory.at(this.pc);
+  readPc(): [number, number] {
+    const addr = this.pc;
+    const ret = this.memory.at(addr);
     this.pc += 1;
-    return ret;
+    return [addr, ret];
   }
 
   step() {
-    const opcode = this.readPc();
-    runInstruction(this, opcode, this.instructionSet);
+    const [addr, opcode] = this.readPc();
+    runInstruction(this, addr, opcode, this.instructionSet);
   }
 
   start() {

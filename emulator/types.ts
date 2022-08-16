@@ -6,7 +6,7 @@ interface IDmg {
   memory: Uint8Array;
   pc: number;
   sp: number;
-  readPc(): number;
+  readPc(): [number, number];
   step(): void;
   log: string[];
   logEvent(log: string): void;
